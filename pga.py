@@ -220,7 +220,9 @@ class PGDAttack:
                 # 5. calc discritized loss
                 most_probable_tokens = relaxed_suffix.argmax(axis=-1)
                 discritized_ids = most_probable_tokens
-                # discritized_ids = self.tokenizer.encode(self.tokenizer.decode(most_probable_tokens), return_tensors="pt")[:, 1:]
+                discritized_ids = self.tokenizer.encode(
+                    self.tokenizer.decode(most_probable_tokens), return_tensors="pt"
+                )[:, 1:].to(self.device)
 
                 # TODO:
                 # proposed improved decoding schema to reduce discritization error
@@ -261,6 +263,9 @@ class PGDAttack:
                     "delta norm": f"{post_update.norm().item() - pre_update.norm().item():.4f}",
                 }
             )
+
+            if i % 20 == 0:
+                print(self.get_model_response(intent, best_relxed_suffix))
 
             if p_target > 0.99:
                 break
